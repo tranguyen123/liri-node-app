@@ -1,7 +1,7 @@
 require("dotenv").config();
 var keys = require('./keys');
-var twitter = require("twitter");
-var spotify = require("node-spotify-api");
+var Twitter = require("twitter");
+var Spotify = require("node-spotify-api");
 var request = require("request");
 var fs = require('fs');
 
@@ -12,7 +12,7 @@ var userCommand = process.argv[2];
 var secondCommand = process.argv[3];
 
 var spotify = new Spotify(keys.spotify);
-var client = new Twitter(keys.twitter);
+var twitter = new Twitter(keys.twitter);
 
 for(i=4; i<process.argv.length; i++){
     secondCommand += '+' + process.argv[i];
@@ -44,13 +44,6 @@ switch(userCommand){
 function fetchTweets(){
 console.log("Tweets headed your way!");
 //new variable for instance of twitter, load keys from imported keys.js
-var client = new twitter({
-
-    consumer_key: keys.twitterKeys.consumer_key,
-    consumer_secret: keys.twitterKeys.consumer_secret,
-    access_token_key: keys.twitterKeys.access_token_key,
-    access_token_secret: keys.twitterKeys.access_token_secret
-});
 
 //parameters for twitter function.
 var parameters = {
@@ -59,7 +52,7 @@ var parameters = {
 };
 
 //call the get method on our client variable twitter instance
-client.get('statuses/user_timeline', parameters, function(error, tweets, response){
+twitter.get('statuses/user_timeline', parameters, function(error, tweets, response){
     if (!error) {
         for (i=0; i<tweets.length; i++) {
             var returnedData = ('Number: ' + (i+1) + '\n' + tweets[i].created_at + '\n' + tweets[i].text + '\n');
@@ -80,6 +73,7 @@ if(secondCommand === undefined){
     searchTrack = "What's My Age Again?";
 }else{
     searchTrack = secondCommand;
+    console.log (searchTrack);
 }
 //launch spotify search
 spotify.search({type:'track', query:searchTrack}, function(err,data){
@@ -107,8 +101,9 @@ if(secondCommand === undefined){
     searchMovie = secondCommand;
 };
 
-var url = 'http://www.omdbapi.com/?t=' + searchMovie +'&y=&plot=long&tomatoes=true&r=json';
+var url = 'http://www.omdbapi.com/?t=' + searchMovie +'&y=&plot=long&tomatoes=true&r=json&apikey=trilogy';
    request(url, function(error, response, body){
+       console.log(searchMovie,JSON.parse(body));
     if(!error && response.statusCode == 200){
         console.log("Title: " + JSON.parse(body)["Title"]);
         console.log("Year: " + JSON.parse(body)["Year"]);
